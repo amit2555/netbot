@@ -1,10 +1,10 @@
 import re
-from nltk.corpus import stopwords
 from nltk.tokenize import sent_tokenize, word_tokenize
 from nltk.stem.wordnet import WordNetLemmatize
+from netbot.lib.common import DEVICE_REGEX
 
 
-replacement_patterns = [
+REPLACE_PATTERNS = [
     (r'won\'t', 'will not'),
     (r'can\'t', 'cannot'),
     (r'i\'m', 'i am'),
@@ -17,8 +17,9 @@ replacement_patterns = [
     (r'(\w+)\'d', '\g<1> would')
     ]
 
+
 class RegexpReplacer(object):
-    def __init__(self, patterns=replacement_patterns):
+    def __init__(self, patterns=REPLACE_PATTERNS):
         self.patterns = [(re.compile(regex), repl) for (regex, repl) in patterns]
 
     def replace(self, text):
@@ -28,16 +29,21 @@ class RegexpReplacer(object):
 
 
 class Preprocessor(RegexpReplacer):
-    def __init__(self, utterance):
+    def __init__(self, doc):
         super(Preprocessor, self).__init__()
-        self.utterance = utterance
+        self.doc = doc
 
-    def tokenize(self, lemmatize=True, **kwargs):
-        self.tokens = word_tokenize(self.utterance)
-        self.tokens = [self.replace(token) for token in self.tokens if token not in stopwords.words('english')]
+    @classmethod
+    def tokenize(cls, doc, lemmatize=True, **kwargs):
+        cls(doc)
+        self.tokens = word_tokenize(self.doc)
+        self.tokens = [self.replace(token) for token in self.tokens if not self.device_match(token)]
         if lemmatize:
             return self.lemmatize(lemma=kwargs.get('lemma', WordNetLemmatize()))
         return self.tokens
 
     def lemmatize(self, lemma):
         return [lemma.lemmatize(token, 'v') for token in self.tokens]
+
+    def device_match(self, token):
+        return re.search(DEVICE_REGEX, token) 

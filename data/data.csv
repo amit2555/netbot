@@ -1,0 +1,25 @@
+disable link between r1 and r2,LinkShutdown
+restart BGP process on r5,RestartProtocol
+restart OSPF process 1 on r2,RestartProtocol
+shutdown interface connecting r6 and r2,LinkShutdown
+gather facts from device r10,GetFacts
+get device facts from r3,GetFacts
+gather device facts from r7,GetFacts
+obtain device facts from r7,GetFacts
+what is uptime of r1,GetFacts
+uptime and image of r9,GetFacts
+version image hostname chassis and model of r3,GetFacts
+what is version and image of r4,GetFacts
+get device neighbors for r7,GetNeighbors
+get neighbors of r7,GetNeighbors
+get interface status from r5,GetInterfaceStatus
+gather interface stats from r2,GetInterfaceStatus
+get interface stats off r1,GetInterfaceStatus
+check local asn 65100 on r2,GetBGPAsn
+check interface te1/1 is Up on r2,GetInterfaceStatus
+check BGP neighbor 10.1.1.1 is Up on r8,GetBGPNeighbors
+check OSPF neighbor is Up on interface te1/2,GetOSPFNeighbors
+check status of BGP neighbor 10.10.10.1 on r4,GetBGPNeighbors
+ensure status of BGP neighbor 1.1.1.1 is Established on r2,GetBGPNeighbors
+bgp neighbor 4.3.4.3 is not active on r2,GetBGPNeighbors
+traffic on gi2/0,GetInterfaceStatus
