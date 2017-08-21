@@ -1,37 +1,48 @@
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.svm import SVC
-from lib.helpers import prefix 
+from sklearn.pipeline import Pipeline
+from lib.helpers import prefix, get_user 
 from netbot.operations.base import REGISTRY 
-#from preprocessor import Preprocessor 
+from preprocessor import Preprocessor 
 import pandas as pd
-import os
+import random
 
 
-USER = os.getlogin().capitalize()
+def identity(arg):
+    return arg
+
+
+USER = get_user()
 QUIT = False
 
 filepath = 'data/data.csv'
 dataset = pd.read_csv(filepath, header=None, names=['message', 'label'])
 
-messages = dataset.message
-labels = dataset.label
+X = dataset.message
+y = dataset.label
 
-vectorizer = TfidfVectorizer(ngram_range=(1, 2), stop_words='english')
-X = vectorizer.fit_transform(messages)
+pipeline = Pipeline([
+               ('preprocessor', Preprocessor()),
+               ('vectorizer', TfidfVectorizer(ngram_range=(1, 2), stop_words='english',
+                                              lowercase=False, tokenizer=identity)),
+               ('classifier', MultinomialNB())
+           ])
 
-clf = MultinomialNB()
-#clf = SVC()
-clf.fit(X, labels)
+pipeline.fit(X, y)
 
 print prefix('How can I help you ' + USER + '?', 'NetBot')
 
 while not QUIT:
     utterance = raw_input(USER + '> ')
-    features  = vectorizer.transform([utterance])
-    operation = REGISTRY[clf.predict(features)[0]]
+    if not utterance:
+        continue
+    if utterance in ('exit', 'quit', 'bye'):
+        QUIT = True
+        print prefix(random.choice(['Goodbye', 'Bye']) , 'NetBot')
+        break 
+
+    operation = REGISTRY[pipeline.predict([utterance])[0]]
     
     result, message = operation(utterance).run()
     print result, message 
-    print prefix('Goodbye.' , USER)
-    QUIT = True

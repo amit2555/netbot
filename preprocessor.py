@@ -1,7 +1,7 @@
-import re
 from nltk.tokenize import sent_tokenize, word_tokenize
-from nltk.stem.wordnet import WordNetLemmatize
+from nltk.stem.wordnet import WordNetLemmatizer
 from netbot.lib.common import DEVICE_REGEX
+import re
 
 
 REPLACE_PATTERNS = [
@@ -29,17 +29,20 @@ class RegexpReplacer(object):
 
 
 class Preprocessor(RegexpReplacer):
-    def __init__(self, doc):
+    def __init__(self):
         super(Preprocessor, self).__init__()
-        self.doc = doc
 
-    @classmethod
-    def tokenize(cls, doc, lemmatize=True, **kwargs):
-        cls(doc)
-        self.tokens = word_tokenize(self.doc)
+    def fit(self, X, y=None):
+        return self
+
+    def transform(self, X):
+        return [self.tokenize(doc) for doc in X]
+
+    def tokenize(self, doc, lemmatize=True, **kwargs):
+        self.tokens = word_tokenize(doc)
         self.tokens = [self.replace(token) for token in self.tokens if not self.device_match(token)]
         if lemmatize:
-            return self.lemmatize(lemma=kwargs.get('lemma', WordNetLemmatize()))
+            return self.lemmatize(lemma=kwargs.get('lemma', WordNetLemmatizer()))
         return self.tokens
 
     def lemmatize(self, lemma):

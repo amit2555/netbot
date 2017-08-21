@@ -15,7 +15,6 @@ get neighbors of r7,GetNeighbors
 get interface status from r5,GetInterfaceStatus
 gather interface stats from r2,GetInterfaceStatus
 get interface stats off r1,GetInterfaceStatus
-check local asn 65100 on r2,GetBGPAsn
 check interface te1/1 is Up on r2,GetInterfaceStatus
 check BGP neighbor 10.1.1.1 is Up on r8,GetBGPNeighbors
 check OSPF neighbor is Up on interface te1/2,GetOSPFNeighbors
@@ -23,3 +22,15 @@ check status of BGP neighbor 10.10.10.1 on r4,GetBGPNeighbors
 ensure status of BGP neighbor 1.1.1.1 is Established on r2,GetBGPNeighbors
 bgp neighbor 4.3.4.3 is not active on r2,GetBGPNeighbors
 traffic on gi2/0,GetInterfaceStatus
+check local asn 65100 on r2,GetBGPParameters
+get asn of r1,GetBGPParameters
+gather asn and router-id of r6,GetBGPParameters
+what is asn of r4,GetBGPParameters
+what is router-id of r2,GetBGPParameters
+get bgp neighbor 2.2.2.2 received route,GetBGPNeighbor
+bgp neighbor 1.1.1.1 advertised routes,GetBGPNeighbor
+bgp neighbor state of r1,GetBGPNeighbor
+bgp neighbors of r1,GetBGPNeighbor
+what is the state of bgp neighbors on r2,GetBGPNeighbor
+what is holdtime of neighbor 4.4.4.4 on r1,GetBGPNeighbor
+keepalive interval of 3.3.3.3 on r6,GetBGPNeighbor

@@ -12,9 +12,6 @@ class GetFacts(BaseOperation):
         self.facts = []
 
     def run(self, *args, **kwargs):
-        attributes = self.extract_attributes(self.utterance)
-        sanitized_attributes = self.sanitize_attributes(attributes)
-
         try:
             for device in self.devices:
                 device_facts = tasks.get_facts(device)
@@ -25,12 +22,11 @@ class GetFacts(BaseOperation):
         output = ''
         for fact in self.facts:
             output += 'hostname: {} '.format(fact['hostname'])
-            if sanitized_attributes:
+            if self.attributes:
                 output += ' '.join('{}: {}'.format(
                     attribute,
-                    fact[attribute]) for attribute in sanitized_attributes)
+                    fact[attribute]) for attribute in self.attributes)
             else:
                 output = ' '.join('{}: {} '.format(item, value) for item, value in fact.iteritems())
             output += '\n' 
         return passed(output)
-

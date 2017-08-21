@@ -1,14 +1,11 @@
-from netbot.lib.common import extract_devices
+from netbot.lib.common import passed, failed, extract_devices
 from functools import partial
+import string
 import re
 
 
 REGISTRY = {}
-
-
-class NoDevicesEntered(Exception):
-    def __init__(self):
-        Exception.__init__(self, 'User did not enter any device')
+STRING_TABLE = string.maketrans("", "")
 
 
 class NotImplemented(Exception):
@@ -23,7 +20,9 @@ class BaseOperation(object):
         self.utterance = utterance
         self.devices = extract_devices(self.utterance) 
         if not self.devices_found:
-            raise NoDevicesEntered
+            failed('User did not enter any device') 
+
+        self.attributes = self.extract_attributes(self.utterance)
 
     def run(self, *args, **kwargs):
         raise NotImplemented('run method is not implemented')
@@ -38,26 +37,13 @@ class BaseOperation(object):
         if not regex_list:
             return False
         fn = partial(_regex_match, utterance)
-        return filter(fn, regex_list)
-
-    @classmethod
-    def sanitize_attributes(cls, user_attributes):
-        if not user_attributes:
-            return False
-        sanitized_attributes = []
-        for attribute in user_attributes:
-            if len(attribute.split()) > 1:
-                attr = re.sub(' ', '_', attribute)
-                sanitized_attributes.append(attr)
-            else:
-                sanitized_attributes.append(attribute)
-        return sanitized_attributes
+        return [re.sub('[- ]', '_', attr.translate(STRING_TABLE, string.punctuation)) for attr in filter(fn, regex_list)]
 
 
 def _regex_match(text, regex):
     match = re.search(regex, text)
     if match:
-        return match.group(0)
+        return regex 
 
 
 def register(name):
