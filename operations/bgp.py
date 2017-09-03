@@ -1,10 +1,7 @@
 from base import BaseOperation, register
 from automation import tasks
-from netbot.lib.common import passed, failed
+from netbot.lib.common import passed, failed, IPADDRESS_RE
 import re
-
-
-IPADDRESS_RE = re.compile(r'\d+.\d+.\d+.\d+')
 
 
 @register('GetBGPParameters')
@@ -29,6 +26,7 @@ class GetBGPParameters(BaseOperation):
         output = ''
         for index, bgp_config in enumerate(self.bgp_config):
             output += 'hostname: {} '.format(self.devices[index].upper())
+            output += '\n'
             output += ' '.join('{}: {}'.format(
                 attribute, bgp_config[attribute]) for attribute in self.attributes)
             output += '\n'
@@ -53,15 +51,17 @@ class GetBGPNeighbor(BaseOperation):
         try:
             for device in self.devices:
                 bgp_neighbors = tasks.get_bgp_neighbors_state(device, self.neighbors)
-                self.bgp_data.extend(bgp_neighbors)
+                self.bgp_data.append(bgp_neighbors)
         except Exception, e:
             return failed(str(e))
         
         output = ''
         for index, bgp_data in enumerate(self.bgp_data):
             output += 'hostname: {} '.format(self.devices[index].upper())
-            output += ' '.join('{}: {}'.format(
-                attribute, bgp_data[attribute]) for attribute in self.attributes)
             output += '\n'
+            for item in bgp_data:
+                output += ' '.join('{}: {}'.format(
+                    attribute, item[attribute]) for attribute in self.attributes)
+                output += '\n'
 
         return passed(output)

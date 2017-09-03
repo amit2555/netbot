@@ -1,12 +1,10 @@
 from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.naive_bayes import MultinomialNB
-from sklearn.svm import SVC
+from sklearn.svm import LinearSVC
 from sklearn.pipeline import Pipeline
-from lib.helpers import prefix, get_user 
+from lib.helpers import prefix, get_user
 from netbot.operations.base import REGISTRY 
 from preprocessor import Preprocessor 
 import pandas as pd
-import random
 
 
 def identity(arg):
@@ -26,23 +24,25 @@ pipeline = Pipeline([
                ('preprocessor', Preprocessor()),
                ('vectorizer', TfidfVectorizer(ngram_range=(1, 2), stop_words='english',
                                               lowercase=False, tokenizer=identity)),
-               ('classifier', MultinomialNB())
+               ('classifier', LinearSVC())
            ])
 
 pipeline.fit(X, y)
-
-print prefix('How can I help you ' + USER + '?', 'NetBot')
+print prefix('NetBot', 'How can I help you ' + USER + '?')
 
 while not QUIT:
-    utterance = raw_input(USER + '> ')
+    utterance = raw_input(prefix(USER))
     if not utterance:
         continue
     if utterance in ('exit', 'quit', 'bye'):
         QUIT = True
-        print prefix(random.choice(['Goodbye', 'Bye']) , 'NetBot')
         break 
 
     operation = REGISTRY[pipeline.predict([utterance])[0]]
-    
-    result, message = operation(utterance).run()
-    print result, message 
+
+    try:
+        result, message = operation(utterance).run()
+        print prefix('NetBot', message)
+    except Exception, e:
+        print prefix('NetBot', str(e))
+        continue

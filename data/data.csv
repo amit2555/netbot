@@ -1,7 +1,25 @@
-disable link between r1 and r2,LinkShutdown
+disable link between r1 and r2,InterfaceShutdown
+shutdown interface connecting r6 and r2,InterfaceShutdown
+shutdown te1/1/1 on r1 facing r2,InterfaceShutdown
+link shut gi 1/1 on r5 connected to r6,InterfaceShutdown
+disable interface on r1 connecting to r4,InterfaceShutdown
+enable interface te1/1 on r1 and te1/1 on r2,InterfaceShutdown
+enable link gi1/0 on r1 and gi1/0 on r2,r2,InterfaceShutdown
+bring up interface gi1/1 on r4 and gi2/1 on r2,InterfaceShutdown
+check connectivity from r1 to 2.3.2.1,CheckConnectivity
+reachability from r2 to 1.1.1.1,CheckConnectivity
+is 2.2.2.2 reachable from r3,CheckConnectivity
+r1 to 3.3.3.3 reachability,CheckConnectivity
+r3 to 2.2.2.2 connectivity,CheckConnectivity
+drain traffic from r1,TrafficDrain
+move traffic away from r1,TrafficDrain
+restore traffic on r1,TrafficDrain
+return traffic to device r1,TrafficDrain
+shift traffic away from r1,TrafficDrain
+shift traffic back to r1,TrafficDrain
 restart BGP process on r5,RestartProtocol
 restart OSPF process 1 on r2,RestartProtocol
-shutdown interface connecting r6 and r2,LinkShutdown
+show os version of r1,GetFacts
 gather facts from device r10,GetFacts
 get device facts from r3,GetFacts
 gather device facts from r7,GetFacts

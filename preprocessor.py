@@ -1,6 +1,6 @@
 from nltk.tokenize import sent_tokenize, word_tokenize
 from nltk.stem.wordnet import WordNetLemmatizer
-from netbot.lib.common import DEVICE_REGEX
+from netbot.lib.common import DEVICE_REGEX, IPADDRESS_RE, INTERFACE_RE
 import re
 
 
@@ -14,7 +14,9 @@ REPLACE_PATTERNS = [
     (r'(\w+)\'ve', '\g<1> have'),
     (r'(\w+)\'s', '\g<1> is'),
     (r'(\w+)\'re', '\g<1> are'),
-    (r'(\w+)\'d', '\g<1> would')
+    (r'(\w+)\'d', '\g<1> would'),
+    (IPADDRESS_RE, '255.255.255.255'),
+    (INTERFACE_RE, 'gi255/255')
     ]
 
 
@@ -24,8 +26,10 @@ class RegexpReplacer(object):
 
     def replace(self, text):
         for (pattern, repl) in self.patterns:
-            s = re.sub(pattern, repl, text)
-        return s
+            if re.search(pattern, text):
+                s = re.sub(pattern, repl, text)
+                return s
+        return text
 
 
 class Preprocessor(RegexpReplacer):
@@ -49,4 +53,4 @@ class Preprocessor(RegexpReplacer):
         return [lemma.lemmatize(token, 'v') for token in self.tokens]
 
     def device_match(self, token):
-        return re.search(DEVICE_REGEX, token) 
+        return re.search(DEVICE_REGEX, token)

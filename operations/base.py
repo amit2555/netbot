@@ -8,6 +8,11 @@ REGISTRY = {}
 STRING_TABLE = string.maketrans("", "")
 
 
+class NoDevicesFound(Exception):
+    def __init__(self):
+        Exception.__init__(self, 'User did not enter any device')
+
+
 class NotImplemented(Exception):
     def __init__(self, message):
         Exception.__init__(self, message)
@@ -20,7 +25,7 @@ class BaseOperation(object):
         self.utterance = utterance
         self.devices = extract_devices(self.utterance) 
         if not self.devices_found:
-            failed('User did not enter any device') 
+            raise NoDevicesFound
 
         self.attributes = self.extract_attributes(self.utterance)
 
